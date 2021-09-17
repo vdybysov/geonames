@@ -37,11 +37,12 @@ async function searchCity(query) {
             longitude,
             population,
             timezone,
+            admGeoNameId,
             adm: { name: { name: adm }, country: { name: { name: country } } }
         } = city
         if (!results[city.geoNameId] || !results[city.geoNameId].name.preferred) {
             results[city.geoNameId] = {
-                name, latitude, longitude, population, timezone, adm, country
+                name, latitude, longitude, population, timezone, admGeoNameId, adm, country
             }
         }
     }
@@ -55,11 +56,12 @@ async function searchCity(query) {
         .slice(0, 20)
 
     for (item of results) {
-        const admCity = await City.findOne({ admGeoNameId: item.geoNameId }).sort({ population: -1 })
+        const admCity = await City.findOne({ admGeoNameId: item.admGeoNameId }).sort({ population: -1 })
             .populate('name')
         if (admCity && admCity.name) {
             item.admCity = admCity.name.name
         }
+        delete item.admGeoNameId
     }
 
     return results
