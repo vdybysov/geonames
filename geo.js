@@ -17,7 +17,7 @@ async function searchCity(query) {
         name: new RegExp(`^${query}`)
     })
 
-    const results = {}
+    let results = {}
 
     for (name of names) {
         const city = await City.findOne({ geoNameId: name.geoNameId })
@@ -29,11 +29,7 @@ async function searchCity(query) {
                     populate: 'name'
                 }, 'name']
             })
-            .populate({
-                path: 'admCity',
-                populate: 'name'
-            })
-        if (!city || !city.name || !city.adm || !city.admCity) {
+        if (!city || !city.name || !city.adm || !city.adm.name) {
             continue
         }
         const {
@@ -41,22 +37,32 @@ async function searchCity(query) {
             longitude,
             population,
             timezone,
-            admCity: { name: { name: admCity } },
             adm: { name: { name: adm }, country: { name: { name: country } } }
         } = city
         if (!results[city.geoNameId] || !results[city.geoNameId].name.preferred) {
             results[city.geoNameId] = {
-                name, latitude, longitude, population, timezone, adm, admCity, country
+                name, latitude, longitude, population, timezone, adm, country
             }
         }
     }
 
-    return Object.values(results)
+    results = Object.values(results)
         .map(({ name: { name }, ...item }) => ({
             name,
             ...item
         }))
         .sort((a, b) => b.population - a.population)
+        .slice(0, 20)
+
+    for (item of results) {
+        const admCity = await City.findOne({ admGeoNameId: item.geoNameId }).sort({ population: -1 })
+            .populate('name')
+        if (admCity && admCity.name) {
+            item.admCity = admCity.name.name
+        }
+    }
+
+    return results
 }
 
 module.exports = { init, searchCity }
