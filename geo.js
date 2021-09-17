@@ -52,8 +52,8 @@ async function searchCity(query) {
     }
 
     return Object.values(results)
-        .map(({ name: { name: city }, ...item }) => ({
-            city,
+        .map(({ name: { name }, ...item }) => ({
+            name,
             ...item
         }))
         .sort((a, b) => b.population - a.population)
