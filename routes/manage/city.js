@@ -86,9 +86,22 @@ router.post('/', async (req, res) => {
     city.admGeoNameId = city.adm.geoNameId
 
     delete city.adm
-    
+
     await upsertName(city.geoNameId, city.name)
     await upsert(City, city)
+
+    res.json({}).end()
+})
+
+router.delete('/', async (req, res) => {
+
+    const { geoNameIds } = req.query
+
+    if (!geoNameIds?.length) {
+        return res.status(400).json({ error: 'NoGeoNameIds' })
+    }
+
+    await City.deleteMany({ geoNameId: { $in: geoNameIds } })
 
     res.json({}).end()
 })

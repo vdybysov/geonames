@@ -63,4 +63,17 @@ router.post('/', async (req, res) => {
     res.json({}).end()
 })
 
+router.delete('/', async (req, res) => {
+
+    const { geoNameIds } = req.query
+
+    if (!geoNameIds?.length) {
+        return res.status(400).json({ error: 'NoGeoNameIds' })
+    }
+
+    await Country.deleteMany({ geoNameId: { $in: geoNameIds } })
+
+    res.json({}).end()
+})
+
 module.exports = router
