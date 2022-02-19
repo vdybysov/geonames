@@ -29,7 +29,8 @@ async function searchCity(query) {
                     populate: 'name'
                 }, 'name']
             })
-        if (!city || !city.name || !city.adm || !city.adm.name) {
+
+        if (!city || !city.name || !city.adm || !city.adm.country) {
             continue
         }
         const {
@@ -38,11 +39,11 @@ async function searchCity(query) {
             population,
             timezone,
             admGeoNameId,
-            adm: { name: { name: adm }, country: { name: { name: country } } }
+            adm: { country: { name: { name: country } } }
         } = city
         if (!results[city.geoNameId] || !results[city.geoNameId].name.preferred) {
             results[city.geoNameId] = {
-                name, latitude, longitude, population, timezone, admGeoNameId, adm, country
+                name, latitude, longitude, population, timezone, admGeoNameId, country
             }
         }
     }

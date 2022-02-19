@@ -9,14 +9,8 @@ dotenv.config()
 app.use(express.json({ extended: true }))
 app.use(cors())
 
-app.use('/city', async (req, res) => {
-    const query = req.query.q || ''
-    let cities = []
-    if (query.length > 1) {
-        cities = await geo.searchCity(query[0].toUpperCase() + query.substring(1).toLowerCase())
-    }
-    res.json({ cities }).end()
-})
+app.use('/city', require('./routes/city'))
+app.use('/manage', require('./routes/manage'))
 
 app.use(async (err, req, res, next) => {
     if (res.headersSent) {

@@ -97,7 +97,8 @@ async function populate() {
             continue
         }
         const split = line.split('\t')
-        const geoNameId = split[0];
+        const geoNameId = +split[0];
+        const name = split[1];
         const latitude = +split[4];
         const longitude = +split[5];
         const countryCode = split[8];
@@ -111,9 +112,12 @@ async function populate() {
         await City.create({
             geoNameId, latitude, longitude, admGeoNameId, population, timezone
         })
-        if (names[geoNameId] && names[geoNameId].length) {
-            await Name.create(names[geoNameId])
-        }
+        names[geoNameId] = [...(names[geoNameId] || []), {
+            geoNameId,
+            lang: 'EN',
+            name
+        }]
+        await Name.create(names[geoNameId])
     }
 
     console.log(`Saved ${await City.countDocuments()} cities.`)

@@ -14,7 +14,7 @@ async function migrateCrimea() {
         useUnifiedTopology: true
     })
 
-    await Country.deleteMany({ code: 'CRI ' })
+    await Country.deleteMany({ code: 'CRI' })
     await Country.create({
         geoNameId: 9000000,
         code: 'CRI'
@@ -31,8 +31,9 @@ async function migrateCrimea() {
         preferred: true
     })
 
-    await Adm.updateOne({ geoNameId: 703883 }, { $set: { countryCode: 'CRI', code: '01' } }) // Респ. Крым
-    await Adm.updateOne({ geoNameId: 698738 }, { $set: { countryCode: 'CRI', code: '02' } }) // Одесская область
+    // Респ. Крым
+    await City.updateMany({ admGeoNameId: 694422 }, { $set: { admGeoNameId: 703883 } }) 
+    await Adm.updateOne({ geoNameId: 703883 }, { $set: { countryCode: 'CRI', code: '01' } })
 
     process.exit(0)
 }
